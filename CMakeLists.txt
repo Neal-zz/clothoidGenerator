@@ -13,13 +13,18 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 # We want to build with -std=c++14. 
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
-ADD_EXECUTABLE(clothoidGenerator src/main.cpp src/clothoid.cpp src/state.cpp)
-
 FIND_PACKAGE(OpenCV REQUIRED)
-INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
-TARGET_LINK_LIBRARIES(clothoidGenerator ${OpenCV_LIBS})
-
-INCLUDE_DIRECTORIES(include)
-
 FIND_PACKAGE(Eigen3 REQUIRED)
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+
+FIND_PATH(LOGGER_INCLUDE_DIR NAMES file_logger.h PATHS /home/neal/usr/include/file_logger)
+FIND_LIBRARY(LOGGER_LIBRARIES file_logger HINTS /home/neal/usr/lib)
+
+INCLUDE_DIRECTORIES(
+  include
+  ${OpenCV_INCLUDE_DIRS}
+  ${LOGGER_INCLUDE_DIR}
+  ${EIGEN3_INCLUDE_DIR}
+)
+
+ADD_EXECUTABLE(clothoidGenerator src/main.cpp src/clothoid.cpp src/state.cpp)
+TARGET_LINK_LIBRARIES(clothoidGenerator ${OpenCV_LIBS} ${LOGGER_LIBRARIES})

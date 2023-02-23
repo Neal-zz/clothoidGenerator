@@ -6,6 +6,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/core/mat.hpp"
+#include <file_logger.h>
 
 using namespace std;
 
@@ -17,6 +18,10 @@ void plotPath(State start, State end, vector<State> pathToPlot,cv::Mat &img) {
     cv::circle(img, cv::Point(end.x, HEIGHT - end.y), 5, cv::Scalar(255,255,255));
     // cv::line(img, cv::Point(start.x, HEIGHT - start.y), cv::Point(end.x, HEIGHT - end.y), cv::Scalar(255,255,255));
     for (int i = 0; i + 1 < pathToPlot.size(); i++) {
+        std::string strout;
+        strout = "cart_pose: " + std::to_string(pathToPlot[i].x) + ' ' +
+            std::to_string(pathToPlot[i].y) + ' ' + std::to_string(pathToPlot[i].theta);
+        neal::logger(neal::LOG_INFO, strout);
         cv::line(img, cv::Point(pathToPlot[i].x, HEIGHT - pathToPlot[i].y), cv::Point(pathToPlot[i + 1].x, HEIGHT - pathToPlot[i + 1].y), cv::Scalar(255, 255, 255));
     }
 
@@ -38,7 +43,7 @@ void Trajgen(State& a, State& b) {
         
         for(int j=0;j<curve.paths.size();j++){
             totLength+=curve.paths[j].lengthOfPath;
-            plotPath(a, b, curve.paths[j].path,img);
+            plotPath(a, b, curve.paths[j].path, img);
         }
         std::cout<<"The total length : "<<totLength<<std::endl;
         cv::waitKey(0);
@@ -51,11 +56,13 @@ int main(int argc,char *argv[]) {
         // x,y,theta,curvature
         State start(std::stod(argv[1]),std::stod(argv[2]),std::stod(argv[3]),std::stod(argv[4]));
         State end(std::stod(argv[5]),std::stod(argv[6]),std::stod(argv[7]),std::stod(argv[8]));
-
         Trajgen(start, end);
 	}
     else {
-        std::cout << "insufficient input parameters..." << std::endl;
+        std::cout << "use default parameters..." << std::endl;
+        State start(255.75, 529.98, -2.89, 0);
+        State end(0.55, 241.06, -1.83, 0);
+        Trajgen(start, end);
     }
 
 }
